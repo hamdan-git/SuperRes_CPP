@@ -18,10 +18,11 @@ void PrintHelp()
 {
 	std::cout << "Hint\n";
 	std::cout << "exe <tif_input_filename> <tif_output_filename> options\n";
-	std::cout << "-a\ttilt angle\n";
-	std::cout << "-s\tstep\n";
+	std::cout << "-a angle_val\ttilt angle\n";
+	std::cout << "-s step_val\tstep\n";
 	std::cout << "-f or -r\tforward or backward regarding the input image acquition\n";
 	std::cout << "-t <algo type>\tcpu or cpu_lut using look up table\n";
+	std::cout << "-m mag_val\tmagnification\n";
 }
 
 //----------------------------------------------------------------------------
