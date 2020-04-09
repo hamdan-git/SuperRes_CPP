@@ -88,21 +88,21 @@ void RotateImage_cpu(const T *pData, int iW, int iH, T *pOutData, int iOutWidth,
 {
 	memset(pOutData, 0, sizeof(T) * iOutWidth*iOutHeight);
 	double fMag = 1.0 / fMagnification;
-	float rads = (theta) * 3.1415926 / 180.0;
-	float cs = cos(rads); // precalculate these values
-	float ss = sin(rads);
-	float xcenterOut = (float)(iOutWidth) / 2.0;   // use float here!
-	float ycenterOut = (float)(iOutHeight) / 2.0;
-	float xcenterIn = (float)iW / 2.0f;
-	float ycenterIn = (float)iH / 2.0f;
+	double rads = (theta) * 3.1415926 / 180.0;
+	double cs = cos(rads); // precalculate these values
+	double ss = sin(rads);
+	double xcenterOut = (double)(iOutWidth) / 2.0;   // use float here!
+	double ycenterOut = (double)(iOutHeight) / 2.0;
+	double xcenterIn = (double)iW / 2.0f;
+	double ycenterIn = (double)iH / 2.0f;
 	for (int row = 0; row < iOutHeight; row++)
 	{
 		for (int col = 0; col < iOutWidth; col++)
 		{
-			float u = (float)col - xcenterOut;
-			float v = (float)row - ycenterOut;
-			float tu = u * cs - v * ss;
-			float tv = v * cs + u * ss;
+			double u = (double)col - xcenterOut;
+			double v = (double)row - ycenterOut;
+			double tu = u * cs - v * ss;
+			double tv = v * cs + u * ss;
 
 			tu *= fMag;
 			tv *= fMag;
@@ -185,8 +185,8 @@ T* RotaeAdd_cpu_lut(const T*pInData, int iW, int iH, int iNumFrames,  int &iOutW
 	T * pTempData = NULL;
 	int iRotWidth = iW;
 	int iRotHeight = iH;
-	double iShiftRow = 0;
-	double step = fStep * fMag;
+	float iShiftRow = 0;
+	float step = fStep * fMag;
 
 	FindDimensionAfterRotation(iW, iH, theta, fMag, iRotWidth, iRotHeight);
 	iOutWidth = iRotWidth;
@@ -239,8 +239,8 @@ T* RotaeAdd_cpu(const T*pInData, int iW, int iH, int iNumFrames,  int &iOutWidth
 	T * pTempData = NULL;
 	int iRotWidth = iW;
 	int iRotHeight = iH;
-	double iShiftRow = 0;
-	double step = fStep * fMag;
+	float iShiftRow = 0;  //have to use float instead of double because the cu code seems to be single even double is used and cause comparison hell
+	float step = fStep * fMag;
 
 	FindDimensionAfterRotation(iW, iH, theta, fMag, iRotWidth, iRotHeight);
 	iOutWidth = iRotWidth;
@@ -252,14 +252,17 @@ T* RotaeAdd_cpu(const T*pInData, int iW, int iH, int iNumFrames,  int &iOutWidth
 	pOutData = new T[iOutFrameSize];
 	pTempData = new T[iRotFrameSize];
 
+	memset(pOutData, 0, sizeof(T)*iOutFrameSize);
 	int iCurIndex = 0;
 	int iPrevIndex = -1;
 
-	for (int iZ = 0; iZ < iNumFrames; iZ++)
+	for (int iZ = 0; iZ < iNumFrames /*&&iZ < 30*/; iZ++)
 	{
 		iCurIndex = (int)iShiftRow*iRotWidth;
 		if (iPrevIndex != iCurIndex)
 		{
+
+			
 			memset(pTempData, 0, iRotFrameSize * sizeof(T));
 
 			int iZIndex = bReversed ? iZ : iNumFrames - 1 - iZ;
